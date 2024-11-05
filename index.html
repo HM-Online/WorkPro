@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Day Work Entry Form</title>
+    <title>Elegant Serif Theme - Multi-Day Work Entry Form</title>
     <style>
         /* Styling */
         body {
@@ -145,7 +145,7 @@
 </head>
 <body>
     <div class="container" id="summary-container">
-        <h1>Multi-Day Work Entry Form</h1>
+        <h1>Elegant Serif Theme - Multi-Day Work Entry Form</h1>
         
         <div class="section work-hours">
             <h2>Work Hours & Earnings</h2>
@@ -177,12 +177,12 @@
 
         <button class="export-btn" onclick="exportToJPG()">Export Summary as JPG</button>
         <button class="new-form-btn" onclick="newForm()">Create New Form</button>
-        <button class="save-btn" onclick="saveData()">Save Data</button>
+        <button class="save-btn" onclick="saveData()">Save to Google Sheets</button>
     </div>
 
     <!-- Hidden Summary View for Export with Two-Column Layout -->
     <div class="summary-view" id="summary-view">
-        <h2>Summary</h2>
+        <h2>Elegant Serif Theme</h2>
 
         <div class="summary-grid">
             <div class="summary-box work-hours-box">
@@ -212,6 +212,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
+        const GOOGLE_SHEETS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwW7Ke7RZYSXoTxKOz87roxyct0TEBYU1_WQzYJUwXT8FNHrQRftUcjSWyW6u2yssYB/exec";
+
         let totalEarnings = 0;
         let totalExpenses = 0;
         let workDays = [];
@@ -222,11 +224,10 @@
             workDayDiv.className = 'work-day-entry';
             workDayDiv.id = workDayId;
 
-            // Create the HTML structure for the workday entry, including a toggle button
             workDayDiv.innerHTML = `
                 <div class="work-day-header" onclick="toggleWorkDay('${workDayId}')">
                     <span>Work Day ${workDays.length + 1}</span>
-                    <span>&#9660;</span> <!-- Down arrow symbol for toggle -->
+                    <span>&#9660;</span>
                 </div>
                 <div class="work-day-content">
                     <label>Date:</label>
@@ -246,11 +247,11 @@
 
                         // Collapse all previous workday entries
             workDays.slice(0, -1).forEach(day => day.querySelector('.work-day-content').style.display = 'none');
-            
+
             addAutoCalculation(workDayDiv);
         }
 
-        // Function to toggle the display of each workday's details
+        // Toggle the display of each workday's details
         function toggleWorkDay(workDayId) {
             const workDayDiv = document.getElementById(workDayId);
             const contentDiv = workDayDiv.querySelector('.work-day-content');
@@ -409,53 +410,28 @@
                 endTime: day.querySelector('.work-day-end-time').value,
                 hourlyRate: day.querySelector('.work-day-hourly-rate').value
             }));
-            
-            const wantToBuyItems = Array.from(document.getElementById('want-to-buy-list').children)
-                .map(item => item.textContent.replace(" ✖", ""));
-
-            const additionalExpenses = Array.from(document.getElementById('expenses-list').children)
-                .map(item => item.textContent.replace(" ✖", ""));
 
             const data = {
-                workDaysData,
-                wantToBuyItems,
-                additionalExpenses,
-                totalEarnings,
-                totalExpenses
+                date: workDaysData.map(w => w.date).join(', '),
+                startTime: workDaysData.map(w => w.startTime).join(', '),
+                endTime: workDaysData.map(w => w.endTime).join(', '),
+                hourlyRate: workDaysData.map(w => w.hourlyRate).join(', '),
+                wantToBuyItems: Array.from(document.getElementById('want-to-buy-list').children)
+                    .map(item => item.textContent.replace(" ✖", "")),
+                additionalExpenses: Array.from(document.getElementById('expenses-list').children)
+                    .map(item => item.textContent.replace(" ✖", ""))
             };
 
-            localStorage.setItem("formData", JSON.stringify(data));
-            alert("Data saved successfully!");
-        }
-
-        function loadData() {
-            const savedData = JSON.parse(localStorage.getItem("formData"));
-
-            if (savedData) {
-                savedData.workDaysData.forEach(dayData => {
-                    addWorkDay();
-                    const lastWorkDay = workDays[workDays.length - 1];
-                    lastWorkDay.querySelector('.work-day-date').value = dayData.date;
-                    lastWorkDay.querySelector('.work-day-start-time').value = dayData.startTime;
-                    lastWorkDay.querySelector('.work-day-end-time').value = dayData.endTime;
-                    lastWorkDay.querySelector('.work-day-hourly-rate').value = dayData.hourlyRate;
-                });
-
-                savedData.wantToBuyItems.forEach(item => {
-                    addToList('want-to-buy-list', item);
-                });
-
-                savedData.additionalExpenses.forEach(expense => {
-                    const [item, cost] = expense.split(' - €');
-                    document.getElementById('expense-item').value = item;
-                    document.getElementById('expense-cost').value = parseFloat(cost);
-                    addExpense();
-                });
-
-                totalEarnings = savedData.totalEarnings;
-                totalExpenses = savedData.totalExpenses;
-                updateGrandTotal();
-            }
+            fetch(GOOGLE_SHEETS_WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => console.log('Data sent to Google Sheets'))
+            .catch(error => console.error('Error:', error));
         }
 
         window.onload = loadData;
