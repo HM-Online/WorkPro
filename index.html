@@ -242,16 +242,15 @@
                 </div>
             `;
 
-            document.getElementById('work-day-list').appendChild(workDayDiv);
+                        document.getElementById('work-day-list').appendChild(workDayDiv);
             workDays.push(workDayDiv);
 
-                        // Collapse all previous workday entries
+            // Collapse all previous workday entries
             workDays.slice(0, -1).forEach(day => day.querySelector('.work-day-content').style.display = 'none');
 
             addAutoCalculation(workDayDiv);
         }
 
-        // Toggle the display of each workday's details
         function toggleWorkDay(workDayId) {
             const workDayDiv = document.getElementById(workDayId);
             const contentDiv = workDayDiv.querySelector('.work-day-content');
@@ -262,7 +261,6 @@
             const startTimeInput = dayElement.querySelector('.work-day-start-time');
             const endTimeInput = dayElement.querySelector('.work-day-end-time');
             const hourlyRateInput = dayElement.querySelector('.work-day-hourly-rate');
-
             [startTimeInput, endTimeInput, hourlyRateInput].forEach(input => {
                 input.addEventListener('input', calculateTotalEarnings);
             });
@@ -281,7 +279,6 @@
                 const startTime = day.querySelector('.work-day-start-time').value;
                 const endTime = day.querySelector('.work-day-end-time').value;
                 const hourlyRate = parseFloat(day.querySelector('.work-day-hourly-rate').value) || 15;
-
                 if (startTime && endTime) {
                     const start = new Date(`1970-01-01T${startTime}:00`);
                     const end = new Date(`1970-01-01T${endTime}:00`);
@@ -289,9 +286,7 @@
                     const totalHours = Math.floor(hoursWorked);
                     const totalMinutes = Math.round((hoursWorked - totalHours) * 60);
                     const earnings = hoursWorked * hourlyRate;
-
                     totalEarnings += earnings;
-
                     day.summary = `
                         ${day.querySelector('.work-day-date').value} | 
                         ${startTime} - ${endTime} | 
@@ -310,35 +305,19 @@
 
         function exportToJPG() {
             const summaryView = document.getElementById("summary-view");
-
-            function loadData() {
-    const savedData = JSON.parse(localStorage.getItem("formData"));
-    if (savedData) {
-        // Process savedData and update the form fields
-        console.log("Data loaded:", savedData);
-    }
-}
-
-
-            // Populate the workdays summary in Elegant Serif Theme layout
             document.getElementById("summary-work-days").innerHTML = workDays.map(day => {
                 return `<div>${day.summary || ""}</div>`;
             }).join("");
-
             document.getElementById("summary-want-to-buy").innerHTML = Array.from(document.getElementById("want-to-buy-list").children)
                 .map(item => `<li>${item.textContent.replace(" ✖", "")}</li>`)
                 .join("");
-
             document.getElementById("summary-expenses").innerHTML = Array.from(document.getElementById("expenses-list").children)
                 .map(item => `<li>${item.textContent.replace(" ✖", "")}</li>`)
                 .join("");
-
             document.getElementById("total-work-earnings").textContent = totalEarnings.toFixed(2);
             document.getElementById("total-additional-expenses").textContent = totalExpenses.toFixed(2);
-
             const grandTotal = totalEarnings + totalExpenses;
             document.getElementById("summary-grand-total").textContent = grandTotal.toFixed(2);
-
             summaryView.style.display = "block";
             html2canvas(summaryView).then(canvas => {
                 const link = document.createElement("a");
@@ -355,15 +334,12 @@
             if (item) {
                 const listItem = document.createElement('li');
                 listItem.textContent = item;
-
                 const deleteIcon = document.createElement('span');
                 deleteIcon.textContent = " ✖";
                 deleteIcon.classList.add('delete-icon');
                 deleteIcon.onclick = () => listItem.remove();
-
                 listItem.appendChild(deleteIcon);
                 list.appendChild(listItem);
-
                 document.getElementById(inputId).value = '';
             }
         }
@@ -371,12 +347,10 @@
         function addExpense() {
             const item = document.getElementById('expense-item').value;
             const cost = parseFloat(document.getElementById('expense-cost').value);
-
             if (item && cost) {
                 const expensesList = document.getElementById('expenses-list');
                 const listItem = document.createElement('li');
                 listItem.textContent = `${item} - €${cost.toFixed(2)}`;
-
                 const deleteIcon = document.createElement('span');
                 deleteIcon.textContent = " ✖";
                 deleteIcon.classList.add('delete-icon');
@@ -385,10 +359,8 @@
                     totalExpenses -= cost;
                     updateGrandTotal();
                 };
-
                 listItem.appendChild(deleteIcon);
                 expensesList.appendChild(listItem);
-
                 totalExpenses += cost;
                 document.getElementById('expense-item').value = '';
                 document.getElementById('expense-cost').value = '';
@@ -419,7 +391,6 @@
                 endTime: day.querySelector('.work-day-end-time').value,
                 hourlyRate: day.querySelector('.work-day-hourly-rate').value
             }));
-
             const data = {
                 date: workDaysData.map(w => w.date).join(', '),
                 startTime: workDaysData.map(w => w.startTime).join(', '),
@@ -430,19 +401,40 @@
                 additionalExpenses: Array.from(document.getElementById('expenses-list').children)
                     .map(item => item.textContent.replace(" ✖", ""))
             };
-
             fetch(GOOGLE_SHEETS_WEB_APP_URL, {
-    method: "POST",
-    mode: "cors",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-})
-.then(response => response.json())
-.then(result => console.log('Response from Google Sheets:', result))
-.catch(error => console.error('Error:', error));
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => console.log('Data sent to Google Sheets'))
+            .catch(error => console.error('Error:', error));
+        }
 
+        function loadData() {
+            const savedData = JSON.parse(localStorage.getItem("formData"));
+            if (savedData) {
+                savedData.workDaysData.forEach(dayData => {
+                    addWorkDay();
+                    const lastWorkDay = workDays[workDays.length - 1];
+                    lastWorkDay.querySelector('.work-day-date').value = dayData.date;
+                    lastWorkDay.querySelector('.work-day-start-time').value = dayData.startTime;
+                    lastWorkDay.querySelector('.work-day-end-time').value = dayData.endTime;
+                    lastWorkDay.querySelector('.work-day-hourly-rate').value = dayData.hourlyRate;
+                });
+                savedData.wantToBuyItems.forEach(item => addToList('want-to-buy-list', 'want-to-buy', item));
+                savedData.additionalExpenses.forEach(expense => {
+                    const [item, cost] = expense.split(' - €');
+                    document.getElementById('expense-item').value = item;
+                    document.getElementById('expense-cost').value = parseFloat(cost);
+                    addExpense();
+                });
+                totalEarnings = savedData.totalEarnings;
+                totalExpenses = savedData.totalExpenses;
+                updateGrandTotal();
+            }
         }
 
         window.onload = loadData;
