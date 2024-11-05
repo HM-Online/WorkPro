@@ -4,7 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Day Work Entry Form</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Styling */
+        body {
+            font-family: Georgia, serif;
+            background-color: #F5F5F5;
+            color: #3B3B3B;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #FFFFFF;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #3B3B3B;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .section {
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .work-day-entry {
+            background-color: #EBF8FF;
+            border: 1px solid #A0AEC0;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .work-day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .work-day-content {
+            display: none;
+            padding-top: 5px;
+        }
+        .grand-total {
+            background-color: #F0FFF4;
+            border: 1px solid #276749;
+            font-weight: bold;
+            font-size: 16px;
+            color: #276749;
+            text-align: center;
+            padding: 15px;
+        }
+        label, input, button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #2C5282;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #2B6CB0;
+        }
+        .export-btn {
+            background-color: #276749;
+        }
+        .clear-btn, .new-form-btn {
+            background-color: #C53030;
+            margin-top: 10px;
+        }
+        .clear-btn:hover, .new-form-btn:hover {
+            background-color: #9B2C2C;
+        }
+        .delete-icon {
+            color: #C53030;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .summary-view {
+            display: none;
+            padding: 20px;
+            background-color: #FFFFFF;
+            color: #333;
+            border-radius: 10px;
+            font-size: 16px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        .summary-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .summary-box {
+            flex: 1;
+            border: 1px solid #A0AEC0;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .summary-box h3 {
+            font-size: 18px;
+            color: #2D3748;
+            margin-bottom: 5px;
+        }
+        .want-to-buy-box {
+            background-color: #EBF4FF;
+            color: #2B6CB0;
+        }
+        .additional-expenses-box {
+            background-color: #FAF5FF;
+            color: #9B2C2C;
+        }
+        .grand-total-box {
+            font-size: 20px;
+            font-weight: bold;
+            color: #276749;
+            background-color: #F0FFF4;
+            border: 2px solid #276749;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container" id="summary-container">
@@ -39,11 +176,11 @@
         </div>
 
         <button class="export-btn" onclick="exportToJPG()">Export Summary as JPG</button>
-        <button class="clear-btn" onclick="clearForm()">Clear All Data</button>
         <button class="new-form-btn" onclick="newForm()">Create New Form</button>
         <button class="save-btn" onclick="saveData()">Save Data</button>
     </div>
 
+    <!-- Hidden Summary View for Export with Two-Column Layout -->
     <div class="summary-view" id="summary-view">
         <h2>Summary</h2>
 
@@ -74,6 +211,255 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="script.js"></script>
+    <script>
+        let totalEarnings = 0;
+        let totalExpenses = 0;
+        let workDays = [];
+
+        function addWorkDay() {
+            const workDayId = `work-day-${workDays.length}`;
+            const workDayDiv = document.createElement('div');
+            workDayDiv.className = 'work-day-entry';
+            workDayDiv.id = workDayId;
+
+            // Create the HTML structure for the workday entry, including a toggle button
+            workDayDiv.innerHTML = `
+                <div class="work-day-header" onclick="toggleWorkDay('${workDayId}')">
+                    <span>Work Day ${workDays.length + 1}</span>
+                    <span>&#9660;</span> <!-- Down arrow symbol for toggle -->
+                </div>
+                <div class="work-day-content">
+                    <label>Date:</label>
+                    <input type="date" class="work-day-date">
+                    <label>Start Time:</label>
+                    <input type="time" class="work-day-start-time">
+                    <label>End Time:</label>
+                    <input type="time" class="work-day-end-time">
+                    <label>Hourly Rate (€):</label>
+                    <input type="number" class="work-day-hourly-rate" placeholder="15" value="15">
+                    <span class="delete-icon" onclick="removeWorkDay('${workDayId}')">✖</span>
+                </div>
+            `;
+
+            document.getElementById('work-day-list').appendChild(workDayDiv);
+            workDays.push(workDayDiv);
+
+                        // Collapse all previous workday entries
+            workDays.slice(0, -1).forEach(day => day.querySelector('.work-day-content').style.display = 'none');
+            
+            addAutoCalculation(workDayDiv);
+        }
+
+        // Function to toggle the display of each workday's details
+        function toggleWorkDay(workDayId) {
+            const workDayDiv = document.getElementById(workDayId);
+            const contentDiv = workDayDiv.querySelector('.work-day-content');
+            contentDiv.style.display = contentDiv.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function addAutoCalculation(dayElement) {
+            const startTimeInput = dayElement.querySelector('.work-day-start-time');
+            const endTimeInput = dayElement.querySelector('.work-day-end-time');
+            const hourlyRateInput = dayElement.querySelector('.work-day-hourly-rate');
+
+            [startTimeInput, endTimeInput, hourlyRateInput].forEach(input => {
+                input.addEventListener('input', calculateTotalEarnings);
+            });
+        }
+
+        function removeWorkDay(id) {
+            const workDayDiv = document.getElementById(id);
+            workDayDiv.remove();
+            workDays = workDays.filter(day => day.id !== id);
+            calculateTotalEarnings();
+        }
+
+        function calculateTotalEarnings() {
+            totalEarnings = 0;
+            workDays.forEach(day => {
+                const startTime = day.querySelector('.work-day-start-time').value;
+                const endTime = day.querySelector('.work-day-end-time').value;
+                const hourlyRate = parseFloat(day.querySelector('.work-day-hourly-rate').value) || 15;
+
+                if (startTime && endTime) {
+                    const start = new Date(`1970-01-01T${startTime}:00`);
+                    const end = new Date(`1970-01-01T${endTime}:00`);
+                    const hoursWorked = (end - start) / (1000 * 60 * 60);
+                    const totalHours = Math.floor(hoursWorked);
+                    const totalMinutes = Math.round((hoursWorked - totalHours) * 60);
+                    const earnings = hoursWorked * hourlyRate;
+
+                    totalEarnings += earnings;
+
+                    day.summary = `
+                        ${day.querySelector('.work-day-date').value} | 
+                        ${startTime} - ${endTime} | 
+                        ${totalHours} hrs ${totalMinutes} min | 
+                        <strong>€${earnings.toFixed(2)}</strong>
+                    `;
+                }
+            });
+            updateGrandTotal();
+        }
+
+        function updateGrandTotal() {
+            const grandTotal = totalEarnings + totalExpenses;
+            document.getElementById('grand-total').textContent = `Grand Total: €${grandTotal.toFixed(2)}`;
+        }
+
+        function exportToJPG() {
+            const summaryView = document.getElementById("summary-view");
+
+            // Populate the workdays summary in Elegant Serif Theme layout
+            document.getElementById("summary-work-days").innerHTML = workDays.map(day => {
+                return `<div>${day.summary || ""}</div>`;
+            }).join("");
+
+            document.getElementById("summary-want-to-buy").innerHTML = Array.from(document.getElementById("want-to-buy-list").children)
+                .map(item => `<li>${item.textContent.replace(" ✖", "")}</li>`)
+                .join("");
+
+            document.getElementById("summary-expenses").innerHTML = Array.from(document.getElementById("expenses-list").children)
+                .map(item => `<li>${item.textContent.replace(" ✖", "")}</li>`)
+                .join("");
+
+            document.getElementById("total-work-earnings").textContent = totalEarnings.toFixed(2);
+            document.getElementById("total-additional-expenses").textContent = totalExpenses.toFixed(2);
+
+            const grandTotal = totalEarnings + totalExpenses;
+            document.getElementById("summary-grand-total").textContent = grandTotal.toFixed(2);
+
+            summaryView.style.display = "block";
+            html2canvas(summaryView).then(canvas => {
+                const link = document.createElement("a");
+                link.download = "summary.jpg";
+                link.href = canvas.toDataURL("image/jpeg", 0.9);
+                link.click();
+                summaryView.style.display = "none";
+            });
+        }
+
+        function addToList(listId, inputId) {
+            const list = document.getElementById(listId);
+            const item = document.getElementById(inputId).value;
+            if (item) {
+                const listItem = document.createElement('li');
+                listItem.textContent = item;
+
+                const deleteIcon = document.createElement('span');
+                deleteIcon.textContent = " ✖";
+                deleteIcon.classList.add('delete-icon');
+                deleteIcon.onclick = () => listItem.remove();
+
+                listItem.appendChild(deleteIcon);
+                list.appendChild(listItem);
+
+                document.getElementById(inputId).value = '';
+            }
+        }
+
+        function addExpense() {
+            const item = document.getElementById('expense-item').value;
+            const cost = parseFloat(document.getElementById('expense-cost').value);
+
+            if (item && cost) {
+                const expensesList = document.getElementById('expenses-list');
+                const listItem = document.createElement('li');
+                listItem.textContent = `${item} - €${cost.toFixed(2)}`;
+
+                const deleteIcon = document.createElement('span');
+                deleteIcon.textContent = " ✖";
+                deleteIcon.classList.add('delete-icon');
+                deleteIcon.onclick = () => {
+                    listItem.remove();
+                    totalExpenses -= cost;
+                    updateGrandTotal();
+                };
+
+                listItem.appendChild(deleteIcon);
+                expensesList.appendChild(listItem);
+
+                totalExpenses += cost;
+                document.getElementById('expense-item').value = '';
+                document.getElementById('expense-cost').value = '';
+                updateGrandTotal();
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('work-day-list').innerHTML = '';
+            document.getElementById('want-to-buy-list').innerHTML = '';
+            document.getElementById('expenses-list').innerHTML = '';
+            totalEarnings = 0;
+            totalExpenses = 0;
+            updateGrandTotal();
+            workDays = [];
+        }
+
+        function newForm() {
+            if (confirm("Are you sure you want to create a new form? This will clear all current data.")) {
+                clearForm();
+            }
+        }
+
+        function saveData() {
+            const workDaysData = workDays.map(day => ({
+                date: day.querySelector('.work-day-date').value,
+                startTime: day.querySelector('.work-day-start-time').value,
+                endTime: day.querySelector('.work-day-end-time').value,
+                hourlyRate: day.querySelector('.work-day-hourly-rate').value
+            }));
+            
+            const wantToBuyItems = Array.from(document.getElementById('want-to-buy-list').children)
+                .map(item => item.textContent.replace(" ✖", ""));
+
+            const additionalExpenses = Array.from(document.getElementById('expenses-list').children)
+                .map(item => item.textContent.replace(" ✖", ""));
+
+            const data = {
+                workDaysData,
+                wantToBuyItems,
+                additionalExpenses,
+                totalEarnings,
+                totalExpenses
+            };
+
+            localStorage.setItem("formData", JSON.stringify(data));
+            alert("Data saved successfully!");
+        }
+
+        function loadData() {
+            const savedData = JSON.parse(localStorage.getItem("formData"));
+
+            if (savedData) {
+                savedData.workDaysData.forEach(dayData => {
+                    addWorkDay();
+                    const lastWorkDay = workDays[workDays.length - 1];
+                    lastWorkDay.querySelector('.work-day-date').value = dayData.date;
+                    lastWorkDay.querySelector('.work-day-start-time').value = dayData.startTime;
+                    lastWorkDay.querySelector('.work-day-end-time').value = dayData.endTime;
+                    lastWorkDay.querySelector('.work-day-hourly-rate').value = dayData.hourlyRate;
+                });
+
+                savedData.wantToBuyItems.forEach(item => {
+                    addToList('want-to-buy-list', item);
+                });
+
+                savedData.additionalExpenses.forEach(expense => {
+                    const [item, cost] = expense.split(' - €');
+                    document.getElementById('expense-item').value = item;
+                    document.getElementById('expense-cost').value = parseFloat(cost);
+                    addExpense();
+                });
+
+                totalEarnings = savedData.totalEarnings;
+                totalExpenses = savedData.totalExpenses;
+                updateGrandTotal();
+            }
+        }
+
+        window.onload = loadData;
+    </script>
 </body>
 </html>
+
