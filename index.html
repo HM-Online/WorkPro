@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Day Work Entry Form</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container" id="summary-container">
+        <h1>Multi-Day Work Entry Form</h1>
+        
+        <div class="section work-hours">
+            <h2>Work Hours & Earnings</h2>
+            <button onclick="addWorkDay()">Add Work Day</button>
+            <div id="work-day-list"></div>
+        </div>
+        
+        <div class="section want-to-buy">
+            <h2>Want to Buy</h2>
+            <label for="want-to-buy">Item Description:</label>
+            <input type="text" id="want-to-buy" placeholder="e.g., 2x carpet (extra for bathroom)">
+            <button onclick="addToList('want-to-buy-list', 'want-to-buy')">Add Item</button>
+            <ul id="want-to-buy-list"></ul>
+        </div>
+        
+        <div class="section additional-expenses">
+            <h2>Additional Expenses</h2>
+            <label for="expense-item">Item Description:</label>
+            <input type="text" id="expense-item" placeholder="e.g., Starwax windows cleaner">
+            <label for="expense-cost">Cost (€):</label>
+            <input type="number" id="expense-cost" placeholder="7.90">
+            <button onclick="addExpense()">Add Expense</button>
+            <ul id="expenses-list"></ul>
+        </div>
+        
+        <div class="grand-total" id="grand-total">
+            Grand Total: €0.00
+        </div>
+
+        <button class="export-btn" onclick="exportToJPG()">Export Summary as JPG</button>
+        <button class="clear-btn" onclick="clearForm()">Clear All Data</button>
+        <button class="new-form-btn" onclick="newForm()">Create New Form</button>
+        <button class="save-btn" onclick="saveData()">Save Data</button>
+    </div>
+
+    <div class="summary-view" id="summary-view">
+        <h2>Summary</h2>
+
+        <div class="summary-grid">
+            <div class="summary-box work-hours-box">
+                <h3>Work Hours & Earnings:</h3>
+                <div id="summary-work-days"></div>
+                <div><strong>Total Earnings:</strong> <strong>€<span id="total-work-earnings"></span></strong></div>
+            </div>
+
+            <div>
+                <div class="summary-box want-to-buy-box">
+                    <h3>Want to Buy:</h3>
+                    <ul id="summary-want-to-buy"></ul>
+                </div>
+
+                <div class="summary-box additional-expenses-box">
+                    <h3>Additional Expenses:</h3>
+                    <ul id="summary-expenses"></ul>
+                    <div><strong>Total Expenses:</strong> €<span id="total-additional-expenses"></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grand-total-box">
+            Grand Total: €<span id="summary-grand-total"></span>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

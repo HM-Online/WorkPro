@@ -1,0 +1,137 @@
+body {
+    font-family: Georgia, serif;
+    background-color: #F5F5F5;
+    color: #3B3B3B;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+.container {
+    width: 80%;
+    max-width: 600px;
+    padding: 20px;
+    background-color: #FFFFFF;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+h1 {
+    font-size: 24px;
+    color: #3B3B3B;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.section {
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+.work-day-entry {
+    background-color: #EBF8FF;
+    border: 1px solid #A0AEC0;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+.grand-total {
+    background-color: #F0FFF4;
+    border: 1px solid #276749;
+    font-weight: bold;
+    font-size: 16px;
+    color: #276749;
+    text-align: center;
+    padding: 15px;
+}
+label, input, button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+}
+button {
+    background-color: #2C5282;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+button:hover {
+    background-color: #2B6CB0;
+}
+.export-btn {
+    background-color: #276749;
+}
+.clear-btn, .new-form-btn {
+    background-color: #C53030;
+    margin-top: 10px;
+}
+.clear-btn:hover, .new-form-btn:hover {
+    background-color: #9B2C2C;
+}
+.save-btn {
+    background-color: #3182CE;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+}
+.save-btn:hover {
+    background-color: #2B6CB0;
+}
+.delete-icon {
+    color: #C53030;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 10px;
+}
+.summary-view {
+    display: none;
+    padding: 20px;
+    background-color: #FFFFFF;
+    color: #333;
+    border-radius: 10px;
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: center;
+}
+.summary-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+.summary-box {
+    flex: 1;
+    border: 1px solid #A0AEC0;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 16px;
+}
+.summary-box h3 {
+    font-size: 18px;
+    color: #2D3748;
+    margin-bottom: 5px;
+}
+.want-to-buy-box {
+    background-color: #EBF4FF;
+    color: #2B6CB0;
+}
+.additional-expenses-box {
+    background-color: #FAF5FF;
+    color: #9B2C2C;
+}
+.grand-total-box {
+    font-size: 20px;
+    font-weight: bold;
+    color: #276749;
+    background-color: #F0FFF4;
+    border: 2px solid #276749;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 20px;
+}
