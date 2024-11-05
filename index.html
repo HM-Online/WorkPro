@@ -311,6 +311,15 @@
         function exportToJPG() {
             const summaryView = document.getElementById("summary-view");
 
+            function loadData() {
+    const savedData = JSON.parse(localStorage.getItem("formData"));
+    if (savedData) {
+        // Process savedData and update the form fields
+        console.log("Data loaded:", savedData);
+    }
+}
+
+
             // Populate the workdays summary in Elegant Serif Theme layout
             document.getElementById("summary-work-days").innerHTML = workDays.map(day => {
                 return `<div>${day.summary || ""}</div>`;
