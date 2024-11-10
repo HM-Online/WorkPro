@@ -1,0 +1,166 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #000; /* Black background */
+    color: #fff; /* White text */
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: #222; /* Dark gray container */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+h1, h2, h3, h4 {
+    text-align: center;
+    color: #ffcc00; /* Gold color */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+label {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #ffcc00; /* Gold color */
+}
+
+input, button {
+    margin-top: 5px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ffcc00; /* Gold border */
+    font-size: 16px;
+    background-color: #333; /* Dark input background */
+    color: #fff;
+}
+
+button {
+    background-color: #ffcc00; /* Gold button */
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #e6b800; /* Darker gold */
+}
+
+#result, #totalsSummary, #expensesList, #itemList {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #333; /* Dark section background */
+    border-radius: 5px;
+    border: 1px solid #ffcc00; /* Gold border */
+}
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.summary-table th, .summary-table td {
+    border: 1px solid #ffcc00; /* Gold border */
+    padding: 10px;
+    text-align: center;
+    color: #fff; /* White text */
+}
+
+.summary-table th {
+    background-color: #333; /* Dark header background */
+    color: #ffcc00; /* Gold text */
+}
+
+.summary-table td {
+    background-color: #444; /* Dark cell background */
+}
+
+ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+li {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #fff; /* White text */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-button {
+    background-color: #ffcc00; /* Gold button */
+    border: none;
+    color: #000;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.remove-button:hover {
+    background-color: #e6b800; /* Darker gold */
+}
+
+.highlight {
+    color: #ffcc00; /* Gold color */
+    font-weight: bold;
+    font-size: 20px;
+    background-color: #333; /* Dark background */
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.save-load-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.save-load-buttons button {
+    background-color: #ffcc00; /* Gold button */
+    border: 1px solid #333;
+    color: #000;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.save-load-buttons button:hover {
+    background-color: #e6b800; /* Darker gold */
+}
+
+.export-box {
+    margin-top: 20px;
+    border: 1px solid #ffcc00; /* Gold border */
+    border-radius: 5px;
+    padding: 15px;
+    background-color: #333; /* Dark section background */
+}
+
+.totals-summary {
+    padding: 15px;
+    background-color: #333; /* Dark background */
+    border: 1px solid #ffcc00; /* Gold border */
+    border-radius: 5px;
+    margin-top: 10px;
+}
