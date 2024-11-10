@@ -196,7 +196,7 @@
         </form>
 
         <div id="result" class="export-box"></div>
-        <button id="exportWorkEntriesButton">Export Work Entries as Image</button>
+        <button id="exportWorkEntriesButton">Export Work Summary as Image</button>
 
         <div id="totalsSummary" class="export-box"></div>
 
@@ -238,32 +238,24 @@
     <!-- Ensure the html2canvas library is included -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
-        // JavaScript code provided by user
-        // Work Log Section
         let workEntries = [];
         let expenses = [];
         let itemList = [];
 
         document.getElementById('workForm').addEventListener('submit', function(e) {
             e.preventDefault();
-
             const date = document.getElementById('date').value;
             const startTime = document.getElementById('startTime').value;
             const endTime = document.getElementById('endTime').value;
             const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
-
-            // Calculate total time worked
             const start = new Date(`1970-01-01T${startTime}:00`);
             const end = new Date(`1970-01-01T${endTime}:00`);
             const totalMilliseconds = end - start;
             const totalMinutes = Math.floor(totalMilliseconds / (1000 * 60));
             const totalHours = Math.floor(totalMinutes / 60);
             const remainingMinutes = totalMinutes % 60;
-
-            // Calculate earnings
             const earnings = ((totalMinutes / 60) * hourlyRate).toFixed(2);
 
-            // Add entry to the workEntries array
             const entry = {
                 date: date,
                 timeRange: `${startTime} - ${endTime}`,
@@ -271,16 +263,13 @@
                 earnings: parseFloat(earnings)
             };
             workEntries.push(entry);
-
-            // Display the updated list of work entries
             displayWorkEntries();
-            displayWorkTotals();
             saveDataLocally();
         });
 
         function displayWorkEntries() {
             const resultContainer = document.getElementById('result');
-            resultContainer.innerHTML = '<h3>Totals Summary:</h3>';
+            resultContainer.innerHTML = '<h3>Work Log:</h3>';
 
             if (workEntries.length > 0) {
                 resultContainer.innerHTML += `
@@ -305,89 +294,34 @@
                         </tbody>
                     </table>
                 `;
-                resultContainer.innerHTML += `
-                    <div class="totals-summary">
-                        <h4>Summary Totals:</h4>
-                        <p><strong>Total Work Earnings:</strong> €${workEntries.reduce((sum, entry) => sum + entry.earnings, 0).toFixed(2)}</p>
-                        <p><strong>Total Additional Expenses:</strong> €${expenses.reduce((sum, expense) => sum + expense.amount, 0).toFixed(2)}</p>
-                        <p class="highlight"><strong>Grand Total:</strong> €${(workEntries.reduce((sum, entry) => sum + entry.earnings, 0) + expenses.reduce((sum, expense) => sum + expense.amount, 0)).toFixed(2)}</p>
-                    </div>
-                `;
             } else {
                 resultContainer.innerHTML += '<p>No work entries found.</p>';
             }
+
+            calculateGrandTotal();
         }
-
-        function removeWorkEntry(index) {
-            workEntries.splice(index, 1);
-            displayWorkEntries();
-            displayWorkTotals();
-            saveDataLocally();
-        }
-
-        function displayWorkTotals() {
-            // This function is now integrated within the displayWorkEntries function
-        }
-
-        // Additional Expenses Section
-        document.getElementById('expenseForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
-            const expenseDescription = document.getElementById('expenseDescription').value;
-
-            // Add expense to the expenses array
-            const expenseEntry = {
-                amount: expenseAmount,
-                description: expenseDescription
-            };
-            expenses.push(expenseEntry);
-
-            // Display the updated list of expenses
-            displayExpenses();
-            displayWorkTotals();
-            saveDataLocally();
-        });
 
         function displayExpenses() {
             const expensesContainer = document.getElementById('expensesList');
             expensesContainer.innerHTML = '<h3>Additional Expenses:</h3>';
 
-            expenses.forEach((expense, index) => {
-                expensesContainer.innerHTML += `
-                    <div class="entry-container">
-                        <p><strong>Description:</strong> ${expense.description}</p>
-                        <p><strong>Amount:</strong> €${expense.amount.toFixed(2)}</p>
-                        <button class="remove-button" onclick="removeExpense(${index})">Remove</button>
-                        <hr>
-                    </div>
-                `;
-            });
+            if (expenses.length > 0) {
+                expenses.forEach((expense, index) => {
+                    expensesContainer.innerHTML += `
+                        <div class="entry-container">
+                            <p><strong>Description:</strong> ${expense.description}</p>
+                            <p><strong>Amount:</strong> €${expense.amount.toFixed(2)}</p>
+                            <button class="remove-button" onclick="removeExpense(${index})">Remove</button>
+                            <hr>
+                        </div>
+                    `;
+                });
+            } else {
+                expensesContainer.innerHTML += '<p>No additional expenses found.</p>';
+            }
+
+            calculateGrandTotal();
         }
-
-        function removeExpense(index) {
-            expenses.splice(index, 1);
-            displayExpenses();
-            displayWorkTotals();
-            saveDataLocally();
-        }
-
-        // Items Request List Section
-        document.getElementById('itemForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const itemName = document.getElementById('itemName').value;
-
-            // Add item to the itemList array
-            const itemEntry = {
-                name: itemName
-            };
-            itemList.push(itemEntry);
-
-            // Display the updated list of items
-            displayItemList();
-            saveDataLocally();
-        });
 
         function displayItemList() {
             const itemListContainer = document.getElementById('itemList');
@@ -396,12 +330,64 @@
                 <ul>
                     ${itemList.map((item, index) => `
                         <li>
-                            ${item.name} 
+                            ${item.name}
                             <button class="remove-button" onclick="removeItem(${index})">Remove</button>
                         </li>
                     `).join('')}
                 </ul>
             `;
+        }
+
+        function calculateGrandTotal() {
+            const totalWorkEarnings = workEntries.reduce((sum, entry) => sum + entry.earnings, 0);
+            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const grandTotal = totalWorkEarnings + totalExpenses;
+
+            const totalsSummaryContainer = document.getElementById('totalsSummary');
+            totalsSummaryContainer.innerHTML = `
+                <div class="totals-summary">
+                    <h4>Summary Totals:</h4>
+                    <p><strong>Total Work Earnings:</strong> €${totalWorkEarnings.toFixed(2)}</p>
+                    <p><strong>Total Additional Expenses:</strong> €${totalExpenses.toFixed(2)}</p>
+                    <p class="highlight"><strong>Grand Total:</strong> €${grandTotal.toFixed(2)}</p>
+                </div>
+            `;
+        }
+
+        document.getElementById('expenseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
+            const expenseDescription = document.getElementById('expenseDescription').value;
+
+            const expenseEntry = {
+                amount: expenseAmount,
+                description: expenseDescription
+            };
+            expenses.push(expenseEntry);
+
+            displayExpenses();
+            saveDataLocally();
+        });
+
+        document.getElementById('itemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const itemName = document.getElementById('itemName').value;
+
+            const itemEntry = {
+                name: itemName
+            };
+            itemList.push(itemEntry);
+
+            displayItemList();
+            saveDataLocally();
+        });
+
+        function removeExpense(index) {
+            expenses.splice(index, 1);
+            displayExpenses();
+            saveDataLocally();
         }
 
         function removeItem(index) {
@@ -410,7 +396,6 @@
             saveDataLocally();
         }
 
-        // Save data to localStorage
         function saveDataLocally() {
             const data = {
                 workEntries: workEntries,
@@ -421,7 +406,6 @@
             alert('Data saved locally!');
         }
 
-        // Load data from localStorage
         function loadDataLocally() {
             const savedData = localStorage.getItem('maintenanceData');
             if (savedData) {
@@ -438,44 +422,43 @@
             }
         }
 
-        // Clear all data function
         function clearAllData() {
-            // Clear all data arrays
             workEntries = [];
             expenses = [];
             itemList = [];
-
-            // Clear local storage
             localStorage.removeItem('maintenanceData');
-
-            // Update the display
             displayWorkEntries();
             displayExpenses();
             displayItemList();
-
             alert('All data has been cleared!');
         }
 
-        // Export Work Entries as Image
         document.getElementById('exportWorkEntriesButton').addEventListener('click', function() {
-            const workEntriesContainer = document.getElementById('result');
-            if (workEntriesContainer.innerHTML.trim() === '') {
-                alert('No work entries to export.');
-                return;
-            }
+            const workSummaryContainer = document.createElement('div');
+            workSummaryContainer.id = 'workSummaryContainer';
 
-            html2canvas(workEntriesContainer).then(canvas => {
+            const resultContainer = document.getElementById('result').cloneNode(true);
+            resultContainer.style.marginBottom = '20px';
+
+            const totalsSummaryContainer = document.getElementById('totalsSummary').cloneNode(true);
+
+            workSummaryContainer.appendChild(resultContainer);
+            workSummaryContainer.appendChild(totalsSummaryContainer);
+
+            document.body.appendChild(workSummaryContainer);
+            html2canvas(workSummaryContainer).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'work_entries.png';
+                link.download = 'work_summary.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
+
+                document.body.removeChild(workSummaryContainer);
             }).catch(err => {
-                console.error('Error exporting work entries:', err);
-                alert('Failed to export work entries. Please try again.');
+                console.error('Error exporting work summary:', err);
+                alert('Failed to export work summary. Please try again.');
             });
         });
 
-        // Export Expenses as Image
         document.getElementById('exportExpensesButton').addEventListener('click', function() {
             const expensesContainer = document.getElementById('expensesList');
             if (expensesContainer.innerHTML.trim() === '') {
@@ -494,26 +477,33 @@
             });
         });
 
-        // Export Item List as Image
         document.getElementById('exportItemListButton').addEventListener('click', function() {
-            const itemListContainer = document.getElementById('itemList');
-            if (itemListContainer.innerHTML.trim() === '') {
-                alert('No items to export.');
-                return;
-            }
+            const itemListContainer = document.createElement('div');
+            itemListContainer.id = 'itemListExportContainer';
 
+            const originalItemList = document.getElementById('itemList').cloneNode(true);
+            const removeButtons = originalItemList.querySelectorAll('.remove-button');
+
+            // Remove all "Remove" buttons from the cloned list
+            removeButtons.forEach(button => button.remove());
+
+            itemListContainer.appendChild(originalItemList);
+
+            // Temporarily add the export container to the body for rendering
+            document.body.appendChild(itemListContainer);
             html2canvas(itemListContainer).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'item_list.png';
+                link.download = 'item_request_list.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
+
+                document.body.removeChild(itemListContainer);
             }).catch(err => {
-                console.error('Error exporting item list:', err);
-                alert('Failed to export item list. Please try again.');
+                console.error('Error exporting item request list:', err);
+                alert('Failed to export item request list. Please try again.');
             });
         });
 
-        // Automatically load data when the page is loaded
         document.addEventListener('DOMContentLoaded', loadDataLocally);
     </script>
 </body>
